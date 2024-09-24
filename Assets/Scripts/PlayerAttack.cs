@@ -6,6 +6,7 @@ using Unity.Properties;
 public class PlayerAttack : MonoBehaviour
 {
     public string attackAniName;
+    public AnimationClip attackClip;
     public PlayerAttackCollider[] attackColliders;
     public bool[] cancelableFrames;
     public bool canCharge;

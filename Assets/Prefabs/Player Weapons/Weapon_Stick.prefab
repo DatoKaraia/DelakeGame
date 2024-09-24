@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackAniName: Stick Heavy 1
+  attackClip: {fileID: -203655887218126122, guid: 568ddef6778c34f46ada5b7ecd63cf59,
+    type: 3}
   attackColliders:
   - {fileID: 7350735706279602076}
   - {fileID: 8561973595542126773}
@@ -239,6 +241,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackAniName: Stick Light 1
+  attackClip: {fileID: -203655887218126122, guid: bf1a3b39c11881d439c31f1d97cdd953,
+    type: 3}
   attackColliders:
   - {fileID: 3103230178031158688}
   cancelableFrames: 00000000000000000000000000000000000000000000000000010101010101010101010101010101010101
@@ -307,6 +311,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackAniName: Stick Heavy 2
+  attackClip: {fileID: -203655887218126122, guid: 7433af804472a86478f566f9d3933de5,
+    type: 3}
   attackColliders:
   - {fileID: 1443297571856983366}
   cancelableFrames: 0000000000000000000000000000000000000000000000000000000000000000000000000000000001010101010101010101010101010101010101010101010101

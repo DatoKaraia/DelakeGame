@@ -176,13 +176,13 @@ public class PlayerController : MonoBehaviour
         }
 
         // Wait for animator to Update
-        while (animator.GetCurrentAnimatorStateInfo(0).IsName(currentAttack.attackAniName))
+        while (!animator.GetCurrentAnimatorStateInfo(0).IsName(currentAttack.attackAniName))
         {
             yield return null;
         }
 
         // Set aniClip to the attack animation
-        aniClip = animator.GetCurrentAnimatorClipInfo(0)[0].clip;
+        aniClip = currentAttack.attackClip;
         // Set animation Length in frames
         aniLength = currentAttack.cancelableFrames.Length;
 
@@ -205,36 +205,40 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            Debug.Log(currentAttack.cancelableFrames[i]);
-
             // Continue Attacking
             if (currentAttack.cancelableFrames[i])
             {
-                // Start a new Light Attack
-                if (type == 1 && Input.GetButtonDown("Light Attack") && attackWeapon.lightAttacks.Length > chainPos)
+                if (Input.GetButton("Heavy Attack") && attackWeapon.heavyAttacks.Length > chainPos + 1 && type == 2)
                 {
                     chainPos++;
-                    currentAttack = attackWeapon.lightAttacks[chainPos];
+                    for (int j = 0; j < currentAttack.attackColliders.Length; j++)
+                    {
+                        currentAttack.attackColliders[j].col.enabled = false;
+                    }
 
-                    animator.Play(currentAttack.attackAniName);
 
-                    yield return null;
+                    Debug.Log(chainPos);
+                    Debug.Log(attackWeapon.heavyAttacks.Length);
 
-                    aniClip = animator.GetCurrentAnimatorClipInfo(0)[0].clip;
-                    aniLength = currentAttack.cancelableFrames.Length;
-                }
-                // Start a new Heavy Attack
-                else if (type == 2 && Input.GetButtonDown("Heavy Attack") && attackWeapon.heavyAttacks.Length > chainPos)
-                {
-                    chainPos++;
                     currentAttack = attackWeapon.heavyAttacks[chainPos];
+                    aniClip = currentAttack.attackClip;
+                    aniLength = currentAttack.cancelableFrames.Length;
 
                     animator.Play(currentAttack.attackAniName);
 
-                    yield return null;
+                    while (!animator.GetCurrentAnimatorStateInfo(0).IsName(currentAttack.attackAniName))
+                    {
+                        yield return null;
+                    }
 
-                    aniClip = animator.GetCurrentAnimatorClipInfo(0)[0].clip;
-                    aniLength = currentAttack.cancelableFrames.Length;
+                    i = 0;
+                }
+
+                else if (xMomentum >= .2f)
+                {
+                    state = 2;
+
+                    yield break;
                 }
             }
 
