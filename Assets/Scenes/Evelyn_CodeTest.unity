@@ -432,8 +432,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8411830478386899679, guid: 222b95d3b20ed9047b16a1c7a543eee7,
         type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411830478386899679, guid: 222b95d3b20ed9047b16a1c7a543eee7,
+        type: 3}
       propertyPath: m_TagString
-      value: Player
+      value: Weapon
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -450,18 +455,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 781129314}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1102746075 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3161629437551235640, guid: 222b95d3b20ed9047b16a1c7a543eee7,
-    type: 3}
-  m_PrefabInstance: {fileID: 781129314}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1052209310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db8594e17dbd142459be3b1c049f05df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1773428102 &1102746076
 ParentConstraint:
   m_ObjectHideFlags: 0
@@ -489,6 +482,18 @@ ParentConstraint:
   m_Sources:
   - sourceTransform: {fileID: 1173887370}
     weight: 1
+--- !u!114 &1102746079 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3161629437551235640, guid: 222b95d3b20ed9047b16a1c7a543eee7,
+    type: 3}
+  m_PrefabInstance: {fileID: 781129314}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1052209310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db8594e17dbd142459be3b1c049f05df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1130991681
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,7 +505,7 @@ GameObject:
   - component: {fileID: 1130991682}
   m_Layer: 0
   m_Name: Lock-On Target
-  m_TagString: Untagged
+  m_TagString: Lock-On Target
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -636,7 +641,13 @@ PrefabInstance:
         type: 3}
       propertyPath: weapon
       value: 
-      objectReference: {fileID: 1102746075}
+      objectReference: {fileID: 1102746079}
+    - target: {fileID: 5784005310607181425, guid: 513f28b31b87d074d9cf6d5452b102bb,
+        type: 3}
+      propertyPath: dodgeAni
+      value: 
+      objectReference: {fileID: -203655887218126122, guid: 11a7766eb705ac94d9b6c7b20fe7e316,
+        type: 3}
     - target: {fileID: 5784005310607181425, guid: 513f28b31b87d074d9cf6d5452b102bb,
         type: 3}
       propertyPath: leftHandPivot
@@ -691,9 +702,10 @@ GameObject:
   - component: {fileID: 1541631447}
   - component: {fileID: 1541631446}
   - component: {fileID: 1541631445}
+  - component: {fileID: 1541631449}
   m_Layer: 0
   m_Name: Target
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -785,6 +797,19 @@ Transform:
   - {fileID: 1130991682}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1541631449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541631444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a119b2f581689a4499d7fdb92db48b58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 1000
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

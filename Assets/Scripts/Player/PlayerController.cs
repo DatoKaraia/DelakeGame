@@ -28,6 +28,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] PlayerWeapon weapon;
     int chainPos = 0;
 
+    //Dodge Variables
+    [SerializeField] int iFrameStart, iFrameEnd;
+    [SerializeField] AnimationClip dodgeAni;
+    int dodgeAniLength = 28;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -46,7 +51,7 @@ public class PlayerController : MonoBehaviour
         /* Uses a State Machine like code to switch between walking, jumping, idle etc.
          * 
          * States:
-         * 0:Falling, 1:Idle, 2:Walking, 3:Running, 4:Attacking
+         * 0:Falling, 1:Idle, 2:Walking, 3:Running, 4:Attacking, 5: Dodging
         */
 
         if (!isGrounded)
@@ -74,6 +79,7 @@ public class PlayerController : MonoBehaviour
 
             checkJump();
             checkAttack();
+            checkDodge();
         }
 
         //Walking
@@ -93,6 +99,7 @@ public class PlayerController : MonoBehaviour
             yAngleFinal = yAngleMovement + yAngleCamera;
             checkJump();
             checkAttack();
+            checkDodge();
         }
 
         //Running
@@ -106,10 +113,20 @@ public class PlayerController : MonoBehaviour
             yAngleFinal = yAngleMovement + yAngleCamera;
             checkJump();
             checkAttack();
+            checkDodge();
+        }
+
+        if (state == 5)
+        {
+
         }
 
 
         animator.SetInteger("State", state);
+
+
+
+
     }
 
     void FixedUpdate()
@@ -153,6 +170,86 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void checkDodge()
+    {
+        if (isGrounded && Input.GetButtonDown("Dodge"))
+        {
+            state = 5;
+            /*
+            if (cameraController.GetComponent<CameraController>().targetLockOn != null)
+            {
+                animator.SetFloat("X Normalised", Input.GetAxis("Vertical"));
+                animator.SetFloat("Y Normalised", Input.GetAxis("Horizontal"));
+            }
+            else
+            {
+                animator.SetFloat("X Normalised", 1);
+                animator.SetFloat("Y Normalised", 0);
+            }
+            */
+
+            StartCoroutine(dodge());
+        }
+    }
+
+    IEnumerator dodge()
+    {
+        animator.Play("5: Dodge");
+
+        for (int i = 0; i < dodgeAniLength; i++)
+        {
+            // Check if colliders should be activated or deactivated
+            
+
+            // Continue Dodging or Cancel Dodge
+            if (i >= 20)
+            {
+                // Dodge Again
+                if (Input.GetButton("Dodge"))
+                {
+
+                    animator.Play("5: Dodge");
+
+                    while (!animator.GetCurrentAnimatorStateInfo(0).IsName("5: Dodge"))
+                    {
+                        yield return null;
+                    }
+
+                    i = 0;
+                }
+
+                // Attack
+                if (Input.GetButtonDown("Light Attack"))
+                {
+                    state = 4;
+                    StartCoroutine(attack(1, weapon));
+                    yield break;
+                }
+
+                else if (Input.GetButtonDown("Heavy Attack"))
+                {
+                    state = 4;
+                    StartCoroutine(attack(2, weapon));
+                    yield break;
+                }
+
+                // Walk
+                else if (xMomentum >= .2f)
+                {
+                    state = 2;
+                    animator.Play("2: Walking");
+                    yield break;
+                }
+            }
+
+            // Wait until next frame
+            yield return new WaitForSeconds(1 / dodgeAni.frameRate);
+        }
+
+        //Go back to Idle
+        state = 1;
+    }
+
     IEnumerator attack(int type, PlayerWeapon attackWeapon)
     {
         chainPos = 0;
@@ -186,8 +283,7 @@ public class PlayerController : MonoBehaviour
         // Set animation Length in frames
         aniLength = currentAttack.cancelableFrames.Length;
 
-
-        // ----------------------- Run Attack ----------------------- //
+        // ----------------------- Do Attack ----------------------- //
 
         //Go through each animator frame
         for (int i = 0; i < aniLength; i++)
@@ -198,6 +294,7 @@ public class PlayerController : MonoBehaviour
                 if (i == currentAttack.attackColliders[j].startFrame)
                 {
                     currentAttack.attackColliders[j].col.enabled = true;
+                    attackWeapon.currentDamage = attackWeapon.weaponDamage * currentAttack.attackColliders[j].motionValue;
                 }
                 if (i == currentAttack.attackColliders[j].endFrame)
                 {
@@ -205,7 +302,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            // Continue Attacking
+            // Continue Attacking or Cancel Attack
             if (currentAttack.cancelableFrames[i])
             {
                 if (Input.GetButton("Heavy Attack") && attackWeapon.heavyAttacks.Length > chainPos + 1 && type == 2)
