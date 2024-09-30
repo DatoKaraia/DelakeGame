@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    [SerializeField] PlayerInputController playerInput;
+
     public GameObject playerCamera;
     public float cameraXSensitivity = 3;
     public float cameraYSensitivity = 3;
@@ -36,8 +38,8 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         // Updates side-to-side and up-and-down movement
-        cameraYRotation += Input.GetAxis("Mouse X") * cameraXSensitivity;
-        cameraXRotation -= Input.GetAxis("Mouse Y") * cameraYSensitivity;
+        cameraYRotation += playerInput.look.ReadValue<Vector2>().x * cameraXSensitivity;
+        cameraXRotation -= playerInput.look.ReadValue<Vector2>().y * cameraYSensitivity;
 
         // Makes the variable loop from -180 to 180. Stops the rotation becoming -14432943 if you spin around too much
         if (Mathf.Abs(cameraYRotation) > 180)
@@ -57,7 +59,7 @@ public class CameraController : MonoBehaviour
 
         // Lock On
 
-        if (Input.GetButtonDown("Lock On"))
+        if (playerInput.lockOn.inBufferDown())
         {
             if (targetLockOn == null && canTarget)
             {

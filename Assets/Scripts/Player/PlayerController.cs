@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Collider col;
     private Animator animator;
+    private PlayerInputController playerInput;
 
     [SerializeField] GameObject cameraController;
 
@@ -38,14 +39,17 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
         animator = GetComponent<Animator>();
+        playerInput = GetComponent<PlayerInputController>();
     }
 
     void Update()
     {
-        xMomentum = Mathf.Max(Mathf.Abs(Input.GetAxis("Horizontal")), Mathf.Abs(Input.GetAxis("Vertical")));
+        //xMomentum = Mathf.Max(Mathf.Abs(Input.GetAxis("Horizontal")), Mathf.Abs(Input.GetAxis("Vertical")));
+        xMomentum = playerInput.move.ReadValue<Vector2>().magnitude;
 
         yAngleCamera = cameraController.transform.rotation.eulerAngles.y;
-        yAngleMovement = (Mathf.Rad2Deg * Mathf.Atan2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
+        //yAngleMovement = (Mathf.Rad2Deg * Mathf.Atan2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
+        yAngleMovement = Mathf.Rad2Deg * Mathf.Atan2(playerInput.move.ReadValue<Vector2>().x, playerInput.move.ReadValue<Vector2>().y);
         transform.rotation = Quaternion.Euler(0f, yAngleFinal, 0f);
 
         /* Uses a State Machine like code to switch between walking, jumping, idle etc.
@@ -85,7 +89,7 @@ public class PlayerController : MonoBehaviour
         //Walking
         if (state == 2)
         {
-            if (Input.GetButton("Run"))
+            if (playerInput.sprint.raw.IsPressed())
             {
                 state = 3;
             }
@@ -105,7 +109,7 @@ public class PlayerController : MonoBehaviour
         //Running
         if (state == 3)
         {
-            if (!Input.GetButton("Run"))
+            if (!playerInput.sprint.raw.IsPressed())
             {
                 state = 2;
             }
@@ -147,7 +151,7 @@ public class PlayerController : MonoBehaviour
 
     void checkJump()
     {
-        if (Input.GetButton("Jump"))
+        if (playerInput.jump.raw.IsPressed())
         {
             state = 0;
             animator.SetTrigger("Jump");
@@ -157,13 +161,13 @@ public class PlayerController : MonoBehaviour
 
     void checkAttack()
     {
-        if (Input.GetButtonDown("Light Attack"))
+        if (playerInput.lightAttack.inBufferDown())
         {
             state = 4;
             StartCoroutine(attack(1, weapon));
         }
 
-        else if (Input.GetButtonDown("Heavy Attack"))
+        else if (playerInput.heavyAttack.inBufferDown())
         {
             state = 4;
             StartCoroutine(attack(2, weapon));
@@ -172,7 +176,7 @@ public class PlayerController : MonoBehaviour
 
     void checkDodge()
     {
-        if (isGrounded && Input.GetButtonDown("Dodge"))
+        if (playerInput.dodge.inBufferDown())
         {
             state = 5;
             /*
@@ -205,7 +209,7 @@ public class PlayerController : MonoBehaviour
             if (i >= 20)
             {
                 // Dodge Again
-                if (Input.GetButton("Dodge"))
+                if (playerInput.dodge.inBufferDown(5))
                 {
 
                     animator.Play("5: Dodge");
@@ -219,14 +223,14 @@ public class PlayerController : MonoBehaviour
                 }
 
                 // Attack
-                if (Input.GetButtonDown("Light Attack"))
+                else if (playerInput.lightAttack.inBufferDown(5))
                 {
                     state = 4;
                     StartCoroutine(attack(1, weapon));
                     yield break;
                 }
 
-                else if (Input.GetButtonDown("Heavy Attack"))
+                else if (playerInput.heavyAttack.inBufferDown(5))
                 {
                     state = 4;
                     StartCoroutine(attack(2, weapon));
@@ -305,7 +309,14 @@ public class PlayerController : MonoBehaviour
             // Continue Attacking or Cancel Attack
             if (currentAttack.cancelableFrames[i])
             {
-                if (Input.GetButton("Heavy Attack") && attackWeapon.heavyAttacks.Length > chainPos + 1 && type == 2)
+                if (playerInput.dodge.inBufferDown(5))
+                {
+                    state = 5;
+                    StartCoroutine(dodge());
+                    yield break;
+                }
+
+                else if (playerInput.heavyAttack.inBufferDown(20) && attackWeapon.heavyAttacks.Length > chainPos + 1 && type == 2)
                 {
                     chainPos++;
                     for (int j = 0; j < currentAttack.attackColliders.Length; j++)
@@ -313,11 +324,29 @@ public class PlayerController : MonoBehaviour
                         currentAttack.attackColliders[j].col.enabled = false;
                     }
 
-
-                    Debug.Log(chainPos);
-                    Debug.Log(attackWeapon.heavyAttacks.Length);
-
                     currentAttack = attackWeapon.heavyAttacks[chainPos];
+                    aniClip = currentAttack.attackClip;
+                    aniLength = currentAttack.cancelableFrames.Length;
+
+                    animator.Play(currentAttack.attackAniName);
+
+                    while (!animator.GetCurrentAnimatorStateInfo(0).IsName(currentAttack.attackAniName))
+                    {
+                        yield return null;
+                    }
+
+                    i = 0;
+                }
+
+                else if (playerInput.lightAttack.inBufferDown(20) && attackWeapon.lightAttacks.Length > chainPos + 1 && type == 1)
+                {
+                    chainPos++;
+                    for (int j = 0; j < currentAttack.attackColliders.Length; j++)
+                    {
+                        currentAttack.attackColliders[j].col.enabled = false;
+                    }
+
+                    currentAttack = attackWeapon.lightAttacks[chainPos];
                     aniClip = currentAttack.attackClip;
                     aniLength = currentAttack.cancelableFrames.Length;
 
