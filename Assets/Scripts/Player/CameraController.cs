@@ -59,7 +59,7 @@ public class CameraController : MonoBehaviour
 
         // Lock On
 
-        if (playerInput.lockOn.inBufferDown())
+        if (Input.GetButtonDown("Lock On"))
         {
             if (targetLockOn == null && canTarget)
             {

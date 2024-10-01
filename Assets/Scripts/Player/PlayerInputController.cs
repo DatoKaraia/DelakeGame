@@ -42,7 +42,7 @@ public class PlayerInputController : MonoBehaviour
     {
         public InputAction raw;
         int framePressed = -1, frameReleased = -1;
-        public int frameCount;
+        public int frameCount = -1;
         
         public InputBuffer(InputAction input)
         {

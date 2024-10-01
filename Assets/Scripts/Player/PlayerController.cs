@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     [NonSerialized] public float xMomentum, yMomentum, yAngleFinal, yAngleMovement, yAngleCamera, speed = 1;
     int state = 1;
     bool isGrounded;
-    RaycastHit groundRaycast;
+    RaycastHit groundRaycast, feetOnGroundRaycast;
     Vector3 deltaVelocity;
 
     //Attack Variables
@@ -141,6 +141,10 @@ public class PlayerController : MonoBehaviour
         {
             yMomentum -= gravity * Time.deltaTime;
         }
+        else if (!Physics.SphereCast(col.bounds.center, .25f, Vector3.down, out groundRaycast, 0.1f, LayerMask.GetMask("Default")))
+        {
+            yMomentum = -0.2f;
+        }
         else {
             yMomentum = 0;
         }
@@ -209,7 +213,7 @@ public class PlayerController : MonoBehaviour
             if (i >= 20)
             {
                 // Dodge Again
-                if (playerInput.dodge.inBufferDown(5))
+                if (playerInput.dodge.inBufferDown(20))
                 {
 
                     animator.Play("5: Dodge");
@@ -223,14 +227,14 @@ public class PlayerController : MonoBehaviour
                 }
 
                 // Attack
-                else if (playerInput.lightAttack.inBufferDown(5))
+                else if (playerInput.lightAttack.inBufferDown(20))
                 {
                     state = 4;
                     StartCoroutine(attack(1, weapon));
                     yield break;
                 }
 
-                else if (playerInput.heavyAttack.inBufferDown(5))
+                else if (playerInput.heavyAttack.inBufferDown(20))
                 {
                     state = 4;
                     StartCoroutine(attack(2, weapon));
@@ -309,14 +313,14 @@ public class PlayerController : MonoBehaviour
             // Continue Attacking or Cancel Attack
             if (currentAttack.cancelableFrames[i])
             {
-                if (playerInput.dodge.inBufferDown(5))
+                if (playerInput.dodge.inBufferDown(20))
                 {
                     state = 5;
                     StartCoroutine(dodge());
                     yield break;
                 }
 
-                else if (playerInput.heavyAttack.inBufferDown(20) && attackWeapon.heavyAttacks.Length > chainPos + 1 && type == 2)
+                else if (playerInput.heavyAttack.inBufferDown(60) && attackWeapon.heavyAttacks.Length > chainPos + 1 && type == 2)
                 {
                     chainPos++;
                     for (int j = 0; j < currentAttack.attackColliders.Length; j++)

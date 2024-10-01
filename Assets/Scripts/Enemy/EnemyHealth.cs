@@ -27,6 +27,7 @@ public class EnemyHealth : MonoBehaviour
         }
         else
         {
+            Debug.Log(health);
         }
     }
 
